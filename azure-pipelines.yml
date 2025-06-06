@@ -13,7 +13,7 @@ pool:
 variables:
   # --- Azure Static Web App Details ---
   # Replace these with your actual Static Web App name
-  staticWebAppName: 'edusync-frontend' # <-- Replace with your SWA name if different
+  staticWebAppName: 'frontendedusync' # <-- Replace with your SWA name if different
   # ------------------------------------
 
 # Define the steps (tasks) for the pipeline
@@ -41,7 +41,7 @@ steps:
 
     # --- Azure Connection Details ---
     # The deployment token is retrieved from pipeline variables securely
-    azure_static_web_apps_api_token: $(deployment_token) # This variable must be set securely!
+    azure_static_web_apps_api_token: $(Deployment token) # This variable must be set securely!
     # You don't need to specify the Service Connection name here for the SWA task.
     # The SWA task uses a dedicated deployment token.
   displayName: 'Deploy to Azure Static Web Apps' # Display name for this step
