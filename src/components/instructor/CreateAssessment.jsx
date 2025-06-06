@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import '../../styles/CreateAssessment.css'
-const API_BASE_URL = "https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net/api";
+const API_BASE_URL = "https://localhost:7278/api";
 
 const defaultOption = { a: "", b: "", c: "", d: "" };
 

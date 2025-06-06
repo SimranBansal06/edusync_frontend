@@ -19,7 +19,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 
 // Define the API base URL
-const API_BASE_URL = 'https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net/api';
+const API_BASE_URL = 'https://localhost:7278/api';
 
 const InstructorDashboard = () => {
     // State management

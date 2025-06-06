@@ -67,7 +67,8 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const API_BASE_URL = "https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net/api"; // Or your Azure API endpoint
+  const API_BASE_URL =
+    "https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net/api";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,20 +80,20 @@ const RegisterPage = () => {
       const registerObj = {
         name: formData.name,
         email: formData.email,
-        passwordHash: formData.password,      // Backend will hash, don't hash on frontend
-        role: formData.role                  // Should be "Student" or "Instructor" as per your UI
+        passwordHash: formData.password, // Backend will hash, don't hash on frontend
+        role: formData.role, // Should be "Student" or "Instructor" as per your UI
         // Don't send UserId - backend generates that!
       };
 
       try {
         await axios.post(`${API_BASE_URL}/UserModels`, registerObj); // adjust endpoint as needed
         // Success: redirect to login
-        navigate('/login');
+        navigate("/login");
       } catch (err) {
         if (err.response && err.response.data) {
           setErrors({ form: err.response.data });
         } else {
-          setErrors({ form: 'Registration failed. Try again.' });
+          setErrors({ form: "Registration failed. Try again." });
         }
         setIsLoading(false);
       }
@@ -252,4 +253,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

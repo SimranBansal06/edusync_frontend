@@ -25,7 +25,7 @@ import { AuthProvider } from './contexts/AuthContext';
 
 // Global configuration for API URLs
 window.API_CONFIG = {
-  BASE_URL: 'https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net',
+  BASE_URL: 'https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net',
   UPLOADS_PATH: '/uploads'
 };
 

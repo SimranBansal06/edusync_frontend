@@ -33,10 +33,10 @@ const LoginPage = () => {
     // Check for remembered email
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     if (rememberedEmail) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         email: rememberedEmail,
-        rememberMe: true
+        rememberMe: true,
       }));
     }
   }, [location.state]);
@@ -66,7 +66,8 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const API_BASE_URL = "https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net/api";
+  const API_BASE_URL =
+    "https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net/api";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,17 +80,21 @@ const LoginPage = () => {
         // Prepare login data
         const loginData = {
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         };
 
         console.log("Attempting login with:", loginData.email);
 
         // Make API request to auth endpoint
-        const response = await axios.post(`${API_BASE_URL}/auth/login`, loginData, {
-          headers: {
-            'Content-Type': 'application/json'
+        const response = await axios.post(
+          `${API_BASE_URL}/auth/login`,
+          loginData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
         console.log("Login successful:", response.data);
 
@@ -119,13 +124,17 @@ const LoginPage = () => {
           if (error.response.status === 401) {
             setErrors({ form: "Invalid email or password" });
           } else if (error.response.status === 404) {
-            setErrors({ form: "User not found. Please check your email or register." });
+            setErrors({
+              form: "User not found. Please check your email or register.",
+            });
           } else {
             setErrors({ form: error.response.data?.message || "Login failed" });
           }
         } else if (error.request) {
           // No response received
-          setErrors({ form: "No response from server. Please check your connection and ensure the API is running." });
+          setErrors({
+            form: "No response from server. Please check your connection and ensure the API is running.",
+          });
         } else {
           // Something else went wrong
           setErrors({ form: `An error occurred: ${error.message}` });
@@ -176,10 +185,7 @@ const LoginPage = () => {
                   placeholder="Enter your password"
                   className={errors.password ? "error" : ""}
                 />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                >
+                <button type="button" onClick={togglePasswordVisibility}>
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
