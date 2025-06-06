@@ -89,24 +89,40 @@ const AssessmentPage = () => {
     e.preventDefault();
     setSubmitted(true);
 
-    // Calculate score
-    let score = 0;
-    const results = assessment.Questions.map((q, i) => {
-      const isCorrect = answers[i] === q.answer;
-      // Use the marks value from each question if available, or default to 1
-      const questionMarks = q.marks || 1;
-      if (isCorrect) score += questionMarks;
-      return {
-        question: q.question,
-        userAnswer: answers[i],
-        correctAnswer: q.answer,
-        isCorrect,
-        options: q.options,
-        marks: questionMarks,
-      };
-    });
-
     try {
+      // Calculate score
+      let score = 0;
+      const results = assessment.Questions.map((q, i) => {
+        const isCorrect = answers[i] === q.answer;
+        const questionMarks = q.marks || 1;
+        if (isCorrect) score += questionMarks;
+        return {
+          question: q.question,
+          userAnswer: answers[i],
+          correctAnswer: q.answer,
+          isCorrect,
+          options: q.options,
+          marks: questionMarks,
+        };
+      });
+
+      // Calculate max possible score
+      const maxPossibleScore = assessment.Questions.reduce(
+        (total, q) => total + (q.marks || 1),
+        0
+      );
+
+      // Prepare the state data
+      const stateData = {
+        score,
+        maxScore: maxPossibleScore,
+        assessmentTitle: assessment.Title,
+        courseId: assessment.CourseId,
+        questions: assessment.Questions,
+        userAnswers: answers,
+        detailedResults: results,
+      };
+
       // Submit to backend
       await axios.post(
         `https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net/api/ResultModels`,
@@ -118,23 +134,13 @@ const AssessmentPage = () => {
         }
       );
 
-      // Calculate max possible score
-      const maxPossibleScore = assessment.Questions.reduce(
-        (total, q) => total + (q.marks || 1),
-        0
-      );
+      // Store the state data in sessionStorage as a backup
+      sessionStorage.setItem("assessmentResults", JSON.stringify(stateData));
 
       // Navigate to results page with detailed data
       navigate(`/courses/${courseId}/results`, {
-        state: {
-          score,
-          maxScore: maxPossibleScore, // Use calculated max score
-          assessmentTitle: assessment.Title,
-          courseId: assessment.CourseId,
-          questions: assessment.Questions,
-          userAnswers: answers,
-          detailedResults: results,
-        },
+        state: stateData,
+        replace: true, // Use replace to prevent back button issues
       });
     } catch (err) {
       console.error("Submission error:", err);

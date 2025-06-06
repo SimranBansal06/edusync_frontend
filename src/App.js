@@ -127,7 +127,11 @@ function App() {
 
               <Route
                 path="/courses/:courseId/results"
-                element={<ResultsPage />}
+                element={
+                  <ProtectedRoute allowedRoles={["Student"]}>
+                    <ResultsPage />
+                  </ProtectedRoute>
+                }
               />
 
               {/* Instructor-specific routes */}
