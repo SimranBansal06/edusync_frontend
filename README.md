@@ -8,11 +8,12 @@ The application is configured to work with different environments:
 
 ### Azure Deployment
 
-This project is configured to work with Azure Static Web Apps and connects to an Azure-hosted backend API. 
+This project is configured to work with Azure Static Web Apps and connects to an Azure-hosted backend API.
 
 The production configuration points to:
+
 - Frontend: https://agreeable-cliff-01fee0e00.6.azurestaticapps.net
-- Backend API: https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net
+- Backend API: https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net
 
 The API URL configuration is set in `src/App.js` using the global `window.API_CONFIG` object.
 
@@ -25,8 +26,8 @@ For local development:
 3. If you need to connect to a local backend, update the `window.API_CONFIG` in `src/App.js` to point to your local API:
    ```javascript
    window.API_CONFIG = {
-     BASE_URL: 'https://localhost:7278',
-     UPLOADS_PATH: '/uploads'
+     BASE_URL: "https://localhost:7278",
+     UPLOADS_PATH: "/uploads",
    };
    ```
 
@@ -113,6 +114,7 @@ This project uses Azure Pipelines for continuous integration and deployment. The
 ## API Integration
 
 The application integrates with a .NET Core backend API. The API endpoints are accessed through:
+
 - Direct API calls using axios
 - Auth service for authentication
 - File service for file uploads and downloads

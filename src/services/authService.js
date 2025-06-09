@@ -44,58 +44,60 @@
 // export const isAuthenticated = () => {
 //     return localStorage.getItem('token') !== null;
 // };
-import axios from 'axios';
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 // Hardcoded URL for Azure deployment
-const API_URL = 'https://edusyncbackendapi-e9hrg2a8exgvgwda.centralindia-01.azurewebsites.net/api/auth/';
+const API_URL =
+  "https://backendwebappedusync-cpfbfqa7fbgvhqed.centralindia-01.azurewebsites.net/api/auth/";
 
 // Create axios instance with interceptors for JWT
 const axiosInstance = axios.create();
 
 // Request interceptor to add JWT to headers
 axiosInstance.interceptors.request.use(
-    (config) => {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        if (user && user.token) {
-            config.headers.Authorization = `Bearer ${user.token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
+  (config) => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (user && user.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-const login = async (email, password) => {
-    try {
-        const response = await axios.post(API_URL + 'login', {
-            email,
-            password,
-        });
+const login = async (username, password) => {
+  try {
+    const response = await axios.post(API_URL + "login", {
+      username,
+      password,
+    });
 
-        if (response.data.token) {
-            sessionStorage.setItem('user', JSON.stringify(response.data));
-        }
-        return response.data;
-    } catch (error) {
-        throw error;
+    if (response.data.token) {
+      sessionStorage.setItem("user", JSON.stringify(response.data));
     }
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const logout = () => {
-    sessionStorage.removeItem('user');
+  sessionStorage.removeItem("user");
 };
 
 const getCurrentUser = () => {
-    return JSON.parse(sessionStorage.getItem('user'));
+  return JSON.parse(sessionStorage.getItem("user"));
 };
 
 const isInstructor = () => {
-    const user = getCurrentUser();
-    return user && user.role && user.role.toLowerCase() === 'instructor';
+  const user = getCurrentUser();
+  return user && user.role && user.role.toLowerCase() === "instructor";
 };
 
 const isStudent = () => {
-    const user = getCurrentUser();
-    return user && user.role && user.role.toLowerCase() === 'student';
+  const user = getCurrentUser();
+  return user && user.role && user.role.toLowerCase() === "student";
 };
 
 /**
@@ -103,23 +105,23 @@ const isStudent = () => {
  * @returns {Object|null} The logged in user or null
  */
 export const getUser = () => {
-    try {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        return user;
-    } catch (error) {
-        console.error("Error parsing user from sessionStorage:", error);
-        return null;
-    }
+  try {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    return user;
+  } catch (error) {
+    console.error("Error parsing user from sessionStorage:", error);
+    return null;
+  }
 };
 
 const authService = {
-    login,
-    logout,
-    getCurrentUser,
-    isInstructor,
-    isStudent,
-    axiosInstance,
-    getUser
+  login,
+  logout,
+  getCurrentUser,
+  isInstructor,
+  isStudent,
+  axiosInstance,
+  getUser,
 };
 
 export default authService;
