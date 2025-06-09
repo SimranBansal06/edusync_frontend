@@ -320,55 +320,103 @@
 .dashboard-section {
     background: var(--white);
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(28, 46, 74, 0.07);
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    transition: box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .dashboard-section:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-section .section-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding-bottom: 1rem;
+    align-items: center;
     margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 .section-header h2 {
     font-size: 1.4rem;
-    font-weight: 600;
-    margin: 0;
+    font-weight: 700;
     color: var(--dark-text);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    margin: 0;
 }
 
 .section-icon {
+    font-size: 1.6rem;
     color: var(--primary-color);
+    flex-shrink: 0;
 }
 
 .section-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 0.95rem;
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
 .section-link:hover {
-    background-color: rgba(139, 15, 35, 0.08);
-    transform: translateY(-2px);
+    color: var(--secondary-color);
 }
 
-/* Add more styles as needed for the rest of the dashboard */ 
+.course-card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.course-description {
+    font-size: 0.95rem;
+    color: var(--light-text);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.course-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--dark-text);
+    gap: 0.3rem;
+}
+
+.meta-icon {
+    color: var(--primary-color);
+}
+
+.view-course-button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-align: center;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    margin-top: auto;
+}
+
+.view-course-button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Add more styles as needed for the rest of the dashboard */
