@@ -253,9 +253,9 @@
 
 .stat-details h3 {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     margin: 0 0 0.5rem;
-    color: var(--dark-text);
+    color: var(--light-text);
 }
 
 .stat-value {
@@ -268,22 +268,24 @@
 /* Dashboard Actions */
 .dashboard-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .action-button {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
     text-decoration: none;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    flex: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
 }
 
 .action-button.primary {
@@ -292,23 +294,23 @@
 }
 
 .action-button.secondary {
-    background-color: var(--navy-bg);
+    background-color: var(--secondary-color);
     color: var(--white);
 }
 
 .action-button.primary:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
+    background-color: #7a0d1e;
+    box-shadow: 0 6px 12px rgba(139, 15, 35, 0.15);
 }
 
 .action-button.secondary:hover {
-    background-color: var(--primary-color);
-    color: var(--white);
-    transform: translateY(-2px);
+    background-color: #590b17;
+    box-shadow: 0 6px 12px rgba(106, 13, 27, 0.15);
 }
 
 .button-icon {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin-right: 0.25rem;
 }
 
 /* Dashboard Sections */
@@ -316,117 +318,122 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
+    margin-top: 2rem;
 }
 
 .dashboard-section {
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(28, 46, 74, 0.07);
     padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(28, 46, 74, 0.07);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .dashboard-section:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .dashboard-section .section-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
 }
 
 .section-header h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
     color: var(--dark-text);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin: 0;
+    gap: 0.5rem;
 }
 
 .section-icon {
-    font-size: 1.6rem;
     color: var(--primary-color);
-    flex-shrink: 0;
+    font-size: 1.2rem;
 }
 
 .section-link {
-    font-size: 0.95rem;
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .section-link:hover {
-    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
+/* Course Card Styles */
 .course-card-body {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
 .course-description {
-    font-size: 0.95rem;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
     color: var(--light-text);
-    margin-bottom: 1rem;
-    line-height: 1.5;
-    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .course-meta {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1.25rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--light-text);
 }
 
 .meta-item {
     display: flex;
     align-items: center;
-    font-size: 0.85rem;
-    color: var(--dark-text);
-    gap: 0.3rem;
+    gap: 0.35rem;
 }
 
 .meta-icon {
-    color: var(--primary-color);
+    font-size: 0.9rem;
 }
 
 .view-course-button {
-    display: block;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    color: var(--white);
-    text-align: center;
-    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    margin-top: 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
     text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-    margin-top: auto;
+    background-color: rgba(139, 15, 35, 0.08);
+    color: var(--primary-color);
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
 }
 
 .view-course-button:hover {
-    background-color: var(--secondary-color);
+    background-color: rgba(139, 15, 35, 0.12);
 }
 
-/* Add more styles as needed for the rest of the dashboard */
-
+/* Modal Styles */
 .modal-body {
-    padding: 1.5rem;
-    color: var(--dark-text);
-    font-size: 1rem;
-    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--light-text);
+    line-height: 1.5;
 }
 
 .modal-body p:last-child {
@@ -434,31 +441,110 @@
 }
 
 .warning-text {
-    color: #dc3545;
+    color: var(--primary-color);
+    font-weight: 500;
 }
 
 .empty-state-actions {
     display: flex;
     justify-content: center;
+    margin-top: 2rem;
     gap: 1rem;
 }
 
-/* Global animations */
+/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Other dashboard specific styles */
-.delete-account-bottom {}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .instructor-dashboard {
+        padding: 1rem;
+    }
+    
+    .dashboard-welcome {
+        padding: 1.5rem;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.5rem;
+    }
+}
 
-.modal-icon {
-    font-size: 1.5rem;
+/* Assessment table styles */
+.assessment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.assessment-table th,
+.assessment-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.assessment-table th {
+    font-weight: 600;
+    color: var(--dark-text);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.assessment-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.assessment-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-icon {
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--light-text);
+}
+
+.action-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+}
+
+.delete-icon:hover {
+    color: #e53e3e;
+}
+
+/* Empty state styles */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--light-text);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
 }

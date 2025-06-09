@@ -577,13 +577,13 @@ const InstructorDashboard = () => {
                     </div>
 
                     {/* Content Sections */}
-                    <div className="dashboard-sections">
+                    <div className={styles["dashboard-sections"]}>
                         {/* Courses Section */}
-                        <section className="dashboard-section">
-                            <div className="section-header">
-                                <h2><FaBook className="section-icon" /> Your Courses</h2>
+                        <section className={styles["dashboard-section"]}>
+                            <div className={styles["section-header"]}>
+                                <h2><FaBook className={styles["section-icon"]} /> Your Courses</h2>
                                 {data.courses.length > 0 && (
-                                    <Link to="/courses" className="section-link">View all</Link>
+                                    <Link to="/courses" className={styles["section-link"]}>View all</Link>
                                 )}
                             </div>
 
@@ -649,10 +649,12 @@ const InstructorDashboard = () => {
                         </section>
 
                         {/* Assessments Section */}
-                        <section className="dashboard-section">
-                            <div className="section-header">
-                                <h2><FaClipboardList className="section-icon" /> Your Assessments</h2>
-                                <Link to="/assessment/create" className="section-link">Create New</Link>
+                        <section className={styles["dashboard-section"]}>
+                            <div className={styles["section-header"]}>
+                                <h2><FaClipboardList className={styles["section-icon"]} /> Your Assessments</h2>
+                                {data.assessments.length > 0 && (
+                                    <Link to="/assessments" className={styles["section-link"]}>View all</Link>
+                                )}
                             </div>
 
                             {data.assessments.length === 0 ? (
