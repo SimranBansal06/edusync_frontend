@@ -20,10 +20,10 @@ const InstructorDashboard = () => {
     });
 
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { currentUser } = useAuth();
 
     useEffect(() => {
-        if (!user) {
+        if (!currentUser) {
             navigate('/login');
             return;
         }
@@ -31,7 +31,7 @@ const InstructorDashboard = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const instructorId = user.id || user.Id;
+                const instructorId = currentUser.id || currentUser.Id;
 
                 // Fetch courses
                 const coursesResponse = await axios.get(`${API_BASE_URL}/CourseModels`);
@@ -76,7 +76,7 @@ const InstructorDashboard = () => {
         };
 
         fetchData();
-    }, [user, navigate]);
+    }, [currentUser, navigate]);
 
     // Function to generate gradient background colors for course cards
     const getGradientBackground = (index) => {
@@ -104,7 +104,7 @@ const InstructorDashboard = () => {
         <div className={styles.dashboardContainer}>
             {/* Welcome Banner */}
             <div className={styles.welcomeBanner}>
-                <h1>Welcome back, {user?.name || user?.Name || 'Instructor'}</h1>
+                <h1>Welcome back, {currentUser?.name || currentUser?.Name || 'Instructor'}</h1>
                 <p>Manage your courses and assessments from your instructor dashboard</p>
             </div>
 
