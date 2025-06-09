@@ -1,1048 +1,289 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from '../styles/InstructorDashboard.module.css';
-import {
-    FaBook,
-    FaClipboardList,
-    FaEdit,
-    FaTrashAlt,
-    FaPlus,
-    FaChartBar,
-    FaExclamationTriangle,
-    FaSync,
-    FaGraduationCap,
-    FaKey,
-    FaEye,
-    FaEyeSlash,
-    FaUsers,
-    FaCheckCircle
-} from 'react-icons/fa';
+import { FaBook, FaClipboardList, FaEdit, FaTrashAlt, FaPlus, FaUsers, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 // Use global API config
 const API_BASE_URL = `${window.API_CONFIG.BASE_URL}/api`;
 
 const InstructorDashboard = () => {
-    // State management
-    const [data, setData] = useState({
-        courses: [],
-        assessments: [],
-        loading: true,  // Start with loading to prevent flash of empty content
-        error: null,
-        initialLoadComplete: false // Track if the initial load has been completed
-    });
-    const [deleteModal, setDeleteModal] = useState({ visible: false, courseId: null, courseTitle: '' });
-    const [deleteStatus, setDeleteStatus] = useState({ loading: false, error: null });
+    const [courses, setCourses] = useState([]);
+    const [assessments, setAssessments] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
-        students: 0,
-        completions: 0,
-        loading: true
+        courseCount: 0,
+        assessmentCount: 0,
+        studentCount: 0,
+        completionCount: 0
     });
-    const [deleteAssessmentModal, setDeleteAssessmentModal] = useState({
-        visible: false,
-        assessmentId: null,
-        assessmentTitle: ''
-    });
-    const [deleteAssessmentStatus, setDeleteAssessmentStatus] = useState({
-        loading: false,
-        error: null
-    });
-    const { logout } = useAuth();
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteLoading, setDeleteLoading] = useState(false);
-    const [deleteError, setDeleteError] = useState("");
 
-    // Password change state
-    const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [passwordData, setPasswordData] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-    });
-    const [passwordLoading, setPasswordLoading] = useState(false);
-    const [passwordError, setPasswordError] = useState("");
-    const [passwordSuccess, setPasswordSuccess] = useState("");
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    // Toggle password visibility
-    const toggleCurrentPasswordVisibility = () => setShowCurrentPassword(!showCurrentPassword);
-    const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
-    const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
-
-    // Change password field handler
-    const handlePasswordChange = (e) => {
-        const { name, value } = e.target;
-        setPasswordData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    // Submit password change
-    const handlePasswordSubmit = async (e) => {
-        e.preventDefault();
-        setPasswordError("");
-        setPasswordSuccess("");
-
-        // Validation
-        if (passwordData.newPassword.length < 6) {
-            setPasswordError("New password must be at least 6 characters");
-            return;
-        }
-
-        if (passwordData.newPassword !== passwordData.confirmPassword) {
-            setPasswordError("Passwords do not match");
-            return;
-        }
-
-        setPasswordLoading(true);
-
-        try {
-            const user = JSON.parse(sessionStorage.getItem('user'));
-            // Get instructor ID
-            const instructorId = user.userId || user.UserId;
-
-            // Get current user data to preserve other fields
-            const getUserResponse = await axios.get(`${API_BASE_URL}/UserModels/${instructorId}`);
-            const userData = getUserResponse.data;
-
-            // Prepare update payload with new password
-            const updatePayload = {
-                ...userData,
-                passwordHash: passwordData.newPassword // Backend will hash the password
-            };
-
-            // Update user with new password
-            await axios.put(`${API_BASE_URL}/UserModels/${instructorId}`, updatePayload, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            setPasswordSuccess("Password changed successfully!");
-
-            // Reset form
-            setPasswordData({
-                currentPassword: "",
-                newPassword: "",
-                confirmPassword: ""
-            });
-
-            // Close modal after delay
-            setTimeout(() => {
-                setShowPasswordModal(false);
-                setPasswordSuccess("");
-            }, 2000);
-
-        } catch (err) {
-            console.error("Password update failed:", err);
-            setPasswordError("Failed to update password. Please try again.");
-        } finally {
-            setPasswordLoading(false);
-        }
-    };
-
-    // Navigation and auth
-    const user = JSON.parse(sessionStorage.getItem('user'));
     const navigate = useNavigate();
+    const { user } = useAuth();
 
-    // Fetch dashboard data
-    const fetchData = useCallback(async () => {
-        if (!user || user.role !== 'Instructor') {
-            navigate(user ? '/dashboard' : '/login');
+    useEffect(() => {
+        if (!user) {
+            navigate('/login');
             return;
         }
 
-        // Only show loading state on first load
-        if (!data.initialLoadComplete) {
-            setData(prev => ({ ...prev, loading: true, error: null }));
-        }
-
-        try {
-            // Extract instructor ID - using UserId as per your model
-            const instructorId = user.id || user.userId || user.UserId;
-
-            // Create empty arrays for defaults if API fails
-            let instructorCourses = [];
-            let instructorAssessments = [];
-
+        const fetchData = async () => {
             try {
-                // Fetch courses - adapting to your CourseModel properties
+                setLoading(true);
+                const instructorId = user.id || user.Id;
+
+                // Fetch courses
                 const coursesResponse = await axios.get(`${API_BASE_URL}/CourseModels`);
-                instructorCourses = coursesResponse.data.filter(course =>
+                const instructorCourses = coursesResponse.data.filter(course => 
                     String(course.instructorId || course.InstructorId) === String(instructorId)
                 );
-            } catch (err) {
-                console.error("Failed to fetch courses:", err);
-                // Don't attempt to retry on critical errors
-                if (err.code === 'ERR_NETWORK' || err.response?.status === 404) {
-                    console.log('Network error or endpoint not found - stopping retry');
-                }
-            }
-
-            // Get course IDs - using CourseId as per your model
-            const courseIds = instructorCourses.map(c => c.courseId || c.CourseId);
-
-            try {
-                // Only fetch assessments if we have courses
-                if (courseIds.length > 0) {
-                    const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
-                    instructorAssessments = assessmentsResponse.data.filter(asm =>
-                        courseIds.includes(asm.courseId || asm.CourseId)
-                    );
-                }
-            } catch (err) {
-                console.error("Failed to fetch assessments:", err);
-            }
-
-            // Set data without delay to prevent flickering
-            setData({
-                courses: instructorCourses,
-                assessments: instructorAssessments,
-                loading: false,
-                error: null,
-                initialLoadComplete: true // Mark initial load as complete
-            });
-
-            // Only fetch statistics if we have courses
-            if (courseIds.length > 0) {
-                fetchStatistics(courseIds);
-            } else {
-                // Reset statistics immediately if no courses
-                setStats({
-                    students: 0,
-                    completions: 0,
-                    loading: false
-                });
-            }
-
-        } catch (err) {
-            console.error("Dashboard fetch error:", err);
-
-            // Set more specific error messages based on error type
-            let errorMessage = 'Failed to load dashboard data';
-
-            if (err.code === 'ERR_NETWORK') {
-                errorMessage = 'Network error. Please check your internet connection.';
-            } else if (err.response?.status === 401) {
-                errorMessage = 'Session expired. Please log in again.';
-                // Optionally redirect to login
-                setTimeout(() => {
-                    logout();
-                    navigate('/login');
-                }, 3000);
-            } else if (err.response?.status >= 500) {
-                errorMessage = 'Server error. Please try again later.';
-            }
-
-            setData(prev => ({
-                ...prev,
-                courses: [],
-                assessments: [],
-                loading: false,
-                error: errorMessage,
-                initialLoadComplete: true // Mark as complete even on error
-            }));
-
-            // Reset statistics
-            setStats({
-                students: 0,
-                completions: 0,
-                loading: false
-            });
-        }
-    }, [navigate, user, logout, data.initialLoadComplete]);
-
-    // Fetch statistics based on course IDs
-    const fetchStatistics = async (courseIds) => {
-        try {
-            setStats(prev => ({ ...prev, loading: true }));
-
-            // Handle no courses case - set stats to 0 and return early
-            if (!courseIds || courseIds.length === 0) {
-                setStats({
-                    students: 0,
-                    completions: 0,
-                    loading: false
-                });
-                return;
-            }
-
-            // Fetch results data - adapting to your ResultModel
-            const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
-
-            // Get assessment IDs for this instructor's courses
-            // Using AssessmentId as per your model
-            const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
-            const instructorAssessmentIds = assessmentsResponse.data
-                .filter(a => courseIds.includes(a.courseId || a.CourseId))
-                .map(a => a.assessmentId || a.AssessmentId);
-
-            // If no assessments, set stats to 0
-            if (!instructorAssessmentIds || instructorAssessmentIds.length === 0) {
-                setStats({
-                    students: 0,
-                    completions: 0,
-                    loading: false
-                });
-                return;
-            }
-
-            // Count results for instructor's assessments
-            const completionsCount = resultsResponse.data.filter(
-                result => instructorAssessmentIds.includes(result.assessmentId || result.AssessmentId)
-            ).length;
-
-            // Count unique students who have taken the instructor's assessments
-            // Using UserId as per your model
-            const uniqueStudentIds = new Set(
-                resultsResponse.data
-                    .filter(result => instructorAssessmentIds.includes(result.assessmentId || result.AssessmentId))
-                    .map(result => result.userId || result.UserId)
-            );
-
-            setStats({
-                students: uniqueStudentIds.size,
-                completions: completionsCount,
-                loading: false
-            });
-
-        } catch (err) {
-            console.error("Statistics fetch error:", err);
-            setStats({
-                students: 0,
-                completions: 0,
-                loading: false
-            });
-        }
-    };
-
-    // Delete course handlers
-    const openDeleteModal = (courseId, courseTitle) => {
-        setDeleteModal({
-            visible: true,
-            courseId,
-            courseTitle
-        });
-    };
-
-    const closeDeleteModal = () => {
-        setDeleteModal({ visible: false, courseId: null, courseTitle: '' });
-        setDeleteStatus({ loading: false, error: null });
-    };
-
-    const confirmDelete = async () => {
-        if (!deleteModal.courseId) return;
-
-        setDeleteStatus({ loading: true, error: null });
-
-        try {
-            const courseId = deleteModal.courseId;
-
-            // 1. First get all assessments for this course
-            const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
-            const courseAssessments = assessmentsResponse.data.filter(assessment =>
-                (assessment.courseId || assessment.CourseId) === courseId
-            );
-
-            // 2. Get all results
-            const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
-
-            // 3. For each assessment, delete its results first
-            for (const assessment of courseAssessments) {
-                const assessmentId = assessment.assessmentId || assessment.AssessmentId;
-
-                // Find results for this assessment
-                const assessmentResults = resultsResponse.data.filter(result =>
-                    (result.assessmentId || result.AssessmentId) === assessmentId
+                
+                // Fetch assessments
+                const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
+                const courseIds = instructorCourses.map(c => c.courseId || c.CourseId);
+                const instructorAssessments = assessmentsResponse.data.filter(assessment => 
+                    courseIds.includes(assessment.courseId || assessment.CourseId)
                 );
 
-                // Delete each result
-                for (const result of assessmentResults) {
-                    const resultId = result.resultId || result.ResultId;
-                    await axios.delete(`${API_BASE_URL}/ResultModels/${resultId}`);
-                    console.log(`Deleted result ID: ${resultId}`);
-                }
+                // Fetch results for statistics
+                const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
+                const assessmentIds = instructorAssessments.map(a => a.assessmentId || a.AssessmentId);
+                
+                // Calculate statistics
+                const assessmentResults = resultsResponse.data.filter(result => 
+                    assessmentIds.includes(result.assessmentId || result.AssessmentId)
+                );
+                
+                const uniqueStudentIds = [...new Set(assessmentResults.map(result => 
+                    result.studentId || result.StudentId
+                ))];
 
-                // Then delete the assessment
-                await axios.delete(`${API_BASE_URL}/AssessmentModels/${assessmentId}`);
-                console.log(`Deleted assessment ID: ${assessmentId}`);
+                setCourses(instructorCourses);
+                setAssessments(instructorAssessments);
+                setStats({
+                    courseCount: instructorCourses.length,
+                    assessmentCount: instructorAssessments.length,
+                    studentCount: uniqueStudentIds.length,
+                    completionCount: assessmentResults.length
+                });
+                
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setLoading(false);
             }
+        };
 
-            // 4. Finally delete the course
-            await axios.delete(`${API_BASE_URL}/CourseModels/${courseId}`);
-            console.log(`Deleted course ID: ${courseId}`);
-
-            // Update the UI after successful deletion
-            setData(prev => ({
-                ...prev,
-                courses: prev.courses.filter(c => (c.courseId || c.CourseId) !== courseId),
-                assessments: prev.assessments.filter(a => (a.courseId || a.CourseId) !== courseId)
-            }));
-
-            setTimeout(() => {
-                closeDeleteModal();
-            }, 1000);
-
-        } catch (err) {
-            console.error("Delete error:", err);
-            setDeleteStatus({
-                loading: false,
-                error: err.response?.data?.message || 'Failed to delete course. Please try again.'
-            });
-        }
-    };
-
-    // Delete assessment handlers
-    const handleDeleteAssessment = (assessmentId, assessmentTitle) => {
-        setDeleteAssessmentModal({
-            visible: true,
-            assessmentId,
-            assessmentTitle
-        });
-    };
-
-    const closeDeleteAssessmentModal = () => {
-        setDeleteAssessmentModal({ visible: false, assessmentId: null, assessmentTitle: '' });
-        setDeleteAssessmentStatus({ loading: false, error: null });
-    };
-
-    const confirmDeleteAssessment = async () => {
-        if (!deleteAssessmentModal.assessmentId) return;
-
-        setDeleteAssessmentStatus({ loading: true, error: null });
-
-        try {
-            const assessmentId = deleteAssessmentModal.assessmentId;
-
-            // 1. Get all results for this assessment
-            const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
-            const assessmentResults = resultsResponse.data.filter(result =>
-                (result.assessmentId || result.AssessmentId) === assessmentId
-            );
-
-            // 2. Delete each result
-            for (const result of assessmentResults) {
-                const resultId = result.resultId || result.ResultId;
-                await axios.delete(`${API_BASE_URL}/ResultModels/${resultId}`);
-                console.log(`Deleted result ID: ${resultId}`);
-            }
-
-            // 3. Delete the assessment
-            await axios.delete(`${API_BASE_URL}/AssessmentModels/${assessmentId}`);
-            console.log(`Deleted assessment ID: ${assessmentId}`);
-
-            // 4. Update the UI after successful deletion
-            setData(prev => ({
-                ...prev,
-                assessments: prev.assessments.filter(a =>
-                    (a.assessmentId || a.AssessmentId) !== assessmentId
-                )
-            }));
-
-            setTimeout(() => {
-                closeDeleteAssessmentModal();
-            }, 1000);
-
-        } catch (err) {
-            console.error("Delete assessment error:", err);
-            setDeleteAssessmentStatus({
-                loading: false,
-                error: err.response?.data?.message || 'Failed to delete assessment. Please try again.'
-            });
-        }
-    };
-
-    // Load data on component mount only
-    useEffect(() => {
         fetchData();
-        // We don't include fetchData in the dependency array to prevent constant rerenders
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user, navigate]);
 
-    if (!user) return null;
-
-
-    const getBackgroundColor = (title) => {
-        const colors = [
-            'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
-            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+    // Function to generate gradient background colors for course cards
+    const getGradientBackground = (index) => {
+        const gradients = [
+            'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+            'linear-gradient(90deg, #fa709a 0%, #fee140 100%)',
+            'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
+            'linear-gradient(90deg, #f093fb 0%, #f5576c 100%)',
+            'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)',
+            'linear-gradient(90deg, #30cfd0 0%, #330867 100%)'
         ];
-
-        let hash = 0;
-        for (let i = 0; i < title.length; i++) {
-            hash = title.charCodeAt(i) + ((hash << 5) - hash);
-        }
-
-        return colors[Math.abs(hash) % colors.length];
+        return gradients[index % gradients.length];
     };
+
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <div className={styles.loadingSpinner}></div>
+                <p>Loading dashboard...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className={styles["instructor-dashboard"]}>
-            {/* Welcome Section */}
-            <div className={styles["dashboard-welcome"]}>
-                <div className={styles["welcome-content"]}>
-                    <h1>Welcome back, <span className={styles["instructor-name"]}>{user.name || user.Name}</span></h1>
-                    <p>Manage your courses and assessments from your instructor dashboard</p>
+        <div className={styles.dashboardContainer}>
+            {/* Welcome Banner */}
+            <div className={styles.welcomeBanner}>
+                <h1>Welcome back, {user?.name || user?.Name || 'Instructor'}</h1>
+                <p>Manage your courses and assessments from your instructor dashboard</p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className={styles.statsContainer}>
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                        <FaBook />
+                    </div>
+                    <div className={styles.statInfo}>
+                        <h2>Your Courses</h2>
+                        <p>{stats.courseCount}</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                        <FaClipboardList />
+                    </div>
+                    <div className={styles.statInfo}>
+                        <h2>Assessments</h2>
+                        <p>{stats.assessmentCount}</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                        <FaUsers />
+                    </div>
+                    <div className={styles.statInfo}>
+                        <h2>Students</h2>
+                        <p>{stats.studentCount}</p>
+                    </div>
+                </div>
+
+                <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                        <FaCheckCircle />
+                    </div>
+                    <div className={styles.statInfo}>
+                        <h2>Completions</h2>
+                        <p>{stats.completionCount}</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Error Alert */}
-            {data.error && (
-                <div className={`${styles.alert} ${styles["alert-error"]}`}>
-                    <FaExclamationTriangle className={styles["alert-icon"]} />
-                    <p>{data.error}</p>
-                    <button onClick={fetchData} className={styles["alert-action"]}>
-                        <FaSync className={styles["icon-spin"]} /> Retry
-                    </button>
-                </div>
-            )}
+            {/* Action Buttons */}
+            <div className={styles.actionButtons}>
+                <Link to="/courses/create" className={styles.createCourseBtn}>
+                    <FaPlus /> Create New Course
+                </Link>
+                <Link to="/assessment/create" className={styles.createAssessmentBtn}>
+                    <FaPlus /> Create Assessment
+                </Link>
+            </div>
 
-            {/* Loading State */}
-            {data.loading ? (
-                <div className={styles["loading-container"]}>
-                    <div className={styles["loading-spinner"]}></div>
-                    <p>Loading your dashboard...</p>
+            {/* Courses Section */}
+            <div className={styles.sectionHeader}>
+                <h2><FaBook className={styles.sectionIcon} /> Your Courses</h2>
+                <Link to="/courses" className={styles.viewAllLink}>View all</Link>
+            </div>
+
+            {courses.length === 0 ? (
+                <div className={styles.emptyState}>
+                    <p>You haven't created any courses yet.</p>
+                    <Link to="/courses/create" className={styles.createCourseBtn}>
+                        <FaPlus /> Create Course
+                    </Link>
                 </div>
             ) : (
-                <>
-                    {/* Stats Section */}
-                    <div className={styles["dashboard-stats"]}>
-                        <div className={`${styles["stat-card"]} ${styles.accent}`}>
-                            <div className={styles["stat-icon"]}>
-                                <FaBook />
-                            </div>
-                            <div className={styles["stat-details"]}>
-                                <h3>Your Courses</h3>
-                                <p className={styles["stat-value"]}>{data.courses.length}</p>
-                            </div>
-                        </div>
-
-                        <div className={`${styles["stat-card"]} ${styles.secondary}`}>
-                            <div className={styles["stat-icon"]}>
-                                <FaClipboardList />
-                            </div>
-                            <div className={styles["stat-details"]}>
-                                <h3>Assessments</h3>
-                                <p className={styles["stat-value"]}>{data.assessments.length}</p>
-                            </div>
-                        </div>
-
-                        <div className={`${styles["stat-card"]} ${styles.neutral}`}>
-                            <div className={styles["stat-icon"]}>
-                                <FaUsers />
-                            </div>
-                            <div className={styles["stat-details"]}>
-                                <h3>Students</h3>
-                                <p className={styles["stat-value"]}>
-                                    {stats.loading ? (
-                                        <span className={styles["loading-dots"]}></span>
-                                    ) : (
-                                        stats.students
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className={`${styles["stat-card"]} ${styles.primary}`}>
-                            <div className={styles["stat-icon"]}>
-                                <FaCheckCircle />
-                            </div>
-                            <div className={styles["stat-details"]}>
-                                <h3>Completions</h3>
-                                <p className={styles["stat-value"]}>
-                                    {stats.loading ? (
-                                        <span className={styles["loading-dots"]}></span>
-                                    ) : (
-                                        stats.completions
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className={styles["dashboard-actions"]}>
-                        <Link to="/courses/create" className={`${styles["action-button"]} ${styles.primary}`}>
-                            <FaPlus className={styles["button-icon"]} /> Create New Course
-                        </Link>
-                        <Link to="/assessment/create" className={`${styles["action-button"]} ${styles.secondary}`}>
-                            <FaPlus className={styles["button-icon"]} /> Create Assessment
-                        </Link>
-                    </div>
-
-                    {/* Content Sections */}
-                    <div className={styles["dashboard-sections"]}>
-                        {/* Courses Section */}
-                        <section className={styles["dashboard-section"]}>
-                            <div className={styles["section-header"]}>
-                                <h2><FaBook className={styles["section-icon"]} /> Your Courses</h2>
-                                {data.courses.length > 0 && (
-                                    <Link to="/courses" className={styles["section-link"]}>View all</Link>
-                                )}
-                            </div>
-
-                            {data.courses.length === 0 ? (
-                                <div className="empty-state">
-                                    <div className="empty-icon">📚</div>
-                                    <h3>No courses yet</h3>
-                                    <p>Create your first course to get started</p>
-                                    <div className="empty-state-actions">
-                                        <Link to="/courses/create" className="action-button primary">
-                                            <FaPlus className="button-icon" /> Create Course
+                <div className={styles.courseGrid}>
+                    {courses.slice(0, 3).map((course, index) => {
+                        const courseId = course.courseId || course.CourseId;
+                        const title = course.title || course.Title;
+                        const description = course.description || course.Description;
+                        
+                        // Count assessments for this course
+                        const courseAssessmentCount = assessments.filter(
+                            a => (a.courseId || a.CourseId) === courseId
+                        ).length;
+                        
+                        return (
+                            <div key={courseId} className={styles.courseCard}>
+                                <div 
+                                    className={styles.courseHeader} 
+                                    style={{ background: getGradientBackground(index) }}
+                                >
+                                    <h3>{title}</h3>
+                                    <div className={styles.courseActions}>
+                                        <Link to={`/courses/${courseId}/edit`} className={styles.editButton}>
+                                            <FaEdit />
                                         </Link>
-                                        <button onClick={fetchData} className="action-button secondary refresh-button">
-                                            <FaSync className="button-icon" /> Refresh Data
+                                        <button className={styles.deleteButton}>
+                                            <FaTrashAlt />
                                         </button>
                                     </div>
                                 </div>
-                            ) : (
-                                <div className="course-grid">
-                                    {data.courses.map(course => {
-                                        const courseId = course.courseId || course.CourseId;
-                                        const courseTitle = course.title || course.Title;
-                                        const description = course.description || course.Description || '';
+                                <div className={styles.courseBody}>
+                                    <p className={styles.courseDescription}>
+                                        {description || "No description provided"}
+                                    </p>
+                                    <div className={styles.courseDetails}>
+                                        <span>{courseAssessmentCount} Assessments</span>
+                                    </div>
+                                    <Link to={`/courses/${courseId}`} className={styles.viewCourseBtn}>
+                                        View Course
+                                    </Link>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
-                                        return (
-                                            <div key={courseId} className="course-card">
-                                                <div className="course-card-header" style={{ background: getBackgroundColor(courseTitle) }}>
-                                                    <h3 className="course-title">{courseTitle}</h3>
-                                                    <div className="course-actions">
-                                                        <Link to={`/courses/${courseId}/edit`} className="course-action edit" title="Edit course">
-                                                            <FaEdit />
-                                                        </Link>
-                                                        <button
-                                                            className="course-action delete"
-                                                            title="Delete course"
-                                                            onClick={() => openDeleteModal(courseId, courseTitle)}
-                                                        >
-                                                            <FaTrashAlt />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div className="course-card-body">
-                                                    <p className="course-description">
-                                                        {description.length > 120 ? description.substring(0, 120) + '...' : description}
-                                                    </p>
-                                                    <div className="course-meta">
-                                                        <span className="meta-item">
-                                                            <FaClipboardList className="meta-icon" />
-                                                            {data.assessments.filter(a =>
-                                                                (a.courseId || a.CourseId) === courseId
-                                                            ).length} Assessments
-                                                        </span>
-                                                    </div>
-                                                    <Link to={`/courses/${courseId}`} className="view-course-button">
-                                                        View Course
-                                                    </Link>
-                                                </div>
+            {/* Assessments Section */}
+            <div className={styles.sectionHeader}>
+                <h2><FaClipboardList className={styles.sectionIcon} /> Your Assessments</h2>
+                <Link to="/assessments" className={styles.viewAllLink}>View all</Link>
+            </div>
+
+            {assessments.length === 0 ? (
+                <div className={styles.emptyState}>
+                    <p>You haven't created any assessments yet.</p>
+                    <Link to="/assessment/create" className={styles.createAssessmentBtn}>
+                        <FaPlus /> Create Assessment
+                    </Link>
+                </div>
+            ) : (
+                <div className={styles.assessmentTable}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Assessment Title</th>
+                                <th>Course</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {assessments.map(assessment => {
+                                const assessmentId = assessment.assessmentId || assessment.AssessmentId;
+                                const courseId = assessment.courseId || assessment.CourseId;
+                                const title = assessment.title || assessment.Title;
+                                
+                                // Find related course
+                                const relatedCourse = courses.find(c => 
+                                    (c.courseId || c.CourseId) === courseId
+                                );
+                                
+                                const courseName = relatedCourse ? 
+                                    (relatedCourse.title || relatedCourse.Title) : 
+                                    'Unknown Course';
+                                
+                                return (
+                                    <tr key={assessmentId}>
+                                        <td>{title}</td>
+                                        <td>
+                                            <div className={styles.courseInfo}>
+                                                <FaBook className={styles.courseIcon} />
+                                                <span>{courseName}</span>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </section>
-
-                        {/* Assessments Section */}
-                        <section className={styles["dashboard-section"]}>
-                            <div className={styles["section-header"]}>
-                                <h2><FaClipboardList className={styles["section-icon"]} /> Your Assessments</h2>
-                                {data.assessments.length > 0 && (
-                                    <Link to="/assessments" className={styles["section-link"]}>View all</Link>
-                                )}
-                            </div>
-
-                            {data.assessments.length === 0 ? (
-                                <div className={styles["empty-state"]}>
-                                    <div className={styles["empty-state-icon"]}>📝</div>
-                                    <h3>No assessments yet</h3>
-                                    <p>Create an assessment for one of your courses</p>
-                                    <div className={styles["empty-state-actions"]}>
-                                        <Link to="/assessment/create" className={`${styles["action-button"]} ${styles.secondary}`}>
-                                            <FaPlus className={styles["button-icon"]} /> Create Assessment
-                                        </Link>
-                                        <button onClick={fetchData} className={`${styles["action-button"]} ${styles.primary}`}>
-                                            <FaSync className={styles["button-icon"]} /> Refresh Data
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className={styles["assessment-table-container"]}>
-                                    <table className={styles["assessment-table"]}>
-                                        <thead>
-                                            <tr>
-                                                <th>Assessment Title</th>
-                                                <th>Course</th>
-                                                <th style={{ textAlign: 'right' }}>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {data.assessments.map(assessment => {
-                                                const assessmentId = assessment.assessmentId || assessment.AssessmentId;
-                                                const courseId = assessment.courseId || assessment.CourseId;
-                                                const title = assessment.title || assessment.Title;
-
-                                                // Find related course
-                                                const relatedCourse = data.courses.find(c =>
-                                                    (c.courseId || c.CourseId) === courseId
-                                                );
-
-                                                const courseName = relatedCourse ?
-                                                    (relatedCourse.title || relatedCourse.Title) :
-                                                    'Unknown Course';
-
-                                                return (
-                                                    <tr key={assessmentId}>
-                                                        <td>
-                                                            <span className={styles["assessment-name"]}>{title}</span>
-                                                        </td>
-                                                        <td>
-                                                            <div className={styles["assessment-course"]}>
-                                                                <FaBook className={styles["course-icon"]} />
-                                                                <span>{courseName}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className={styles["assessment-actions"]}>
-                                                                <Link
-                                                                    to={`/courses/${courseId}/assessment/${assessmentId}`}
-                                                                    className={styles["view-button"]}
-                                                                >
-                                                                    View
-                                                                </Link>
-                                                                <button
-                                                                    className={styles["delete-button"]}
-                                                                    title="Delete assessment"
-                                                                    onClick={() => handleDeleteAssessment(assessmentId, title)}
-                                                                >
-                                                                    <FaTrashAlt />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </section>
-                    </div>
-                    {/* Delete Account Button - Bottom of Dashboard */}
-                    <div className="delete-account-bottom">
-                        <button className="change-password-btn" onClick={() => setShowPasswordModal(true)}>
-                            <FaKey className="btn-icon" /> Change Password
-                        </button>
-                        <button className="delete-account-btn" onClick={() => setShowDeleteModal(true)}>
-                            <FaTrashAlt className="btn-icon" /> Delete Account
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {/* Delete Confirmation Modal */}
-            {deleteModal.visible && (
-                <div className="modal-overlay">
-                    <div className="confirmation-modal">
-                        <div className="modal-header">
-                            <h3>
-                                <FaTrashAlt className="modal-icon" />
-                                Delete Course
-                            </h3>
-                        </div>
-
-                        <div className="modal-body">
-                            <p>Are you sure you want to delete <strong>"{deleteModal.courseTitle}"</strong>?</p>
-                            <p className="warning-text">
-                                <FaExclamationTriangle className="warning-icon" />
-                                This action cannot be undone and will delete all associated assessments and student data.
-                            </p>
-
-                            {deleteStatus.error && (
-                                <div className="alert alert-error">
-                                    {deleteStatus.error}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="modal-footer">
-                            <button
-                                className="modal-button cancel"
-                                onClick={closeDeleteModal}
-                                disabled={deleteStatus.loading}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="modal-button delete"
-                                onClick={confirmDelete}
-                                disabled={deleteStatus.loading}
-                            >
-                                {deleteStatus.loading ? 'Deleting...' : 'Delete Course'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Assessment Confirmation Modal */}
-            {deleteAssessmentModal.visible && (
-                <div className="modal-overlay">
-                    <div className="confirmation-modal">
-                        <div className="modal-header">
-                            <h3>
-                                <FaTrashAlt className="modal-icon" />
-                                Delete Assessment
-                            </h3>
-                        </div>
-
-                        <div className="modal-body">
-                            <p>Are you sure you want to delete <strong>"{deleteAssessmentModal.assessmentTitle}"</strong>?</p>
-                            <p className="warning-text">
-                                <FaExclamationTriangle className="warning-icon" />
-                                This action cannot be undone and will delete all associated student data.
-                            </p>
-
-                            {deleteAssessmentStatus.error && (
-                                <div className="alert alert-error">
-                                    {deleteAssessmentStatus.error}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="modal-footer">
-                            <button
-                                className="modal-button cancel"
-                                onClick={closeDeleteAssessmentModal}
-                                disabled={deleteAssessmentStatus.loading}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="modal-button delete"
-                                onClick={confirmDeleteAssessment}
-                                disabled={deleteAssessmentStatus.loading}
-                            >
-                                {deleteAssessmentStatus.loading ? 'Deleting...' : 'Delete Assessment'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Account Confirmation Modal */}
-            {showDeleteModal && (
-                <div className="modal-overlay">
-                    <div className="confirmation-modal">
-                        <div className="modal-header">
-                            <h3><FaTrashAlt className="modal-icon" /> Delete Account</h3>
-                        </div>
-                        <div className="modal-body">
-                            <p>Are you sure you want to delete your account? This action cannot be undone and will delete all your courses, assessments, and results.</p>
-                            {deleteError && <div className="alert alert-error">{deleteError}</div>}
-                        </div>
-                        <div className="modal-footer">
-                            <button
-                                className="modal-button cancel"
-                                onClick={() => setShowDeleteModal(false)}
-                                disabled={deleteLoading}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="modal-button delete"
-                                onClick={async () => {
-                                    setDeleteLoading(true);
-                                    setDeleteError("");
-
-                                    try {
-                                        const user = JSON.parse(sessionStorage.getItem('user'));
-                                        const instructorId = user.userId || user.UserId;
-                                        const token = user?.token;
-
-                                        // 1. Fetch all courses owned by this instructor
-                                        console.log("Fetching instructor courses...");
-                                        const coursesResponse = await axios.get(`${API_BASE_URL}/CourseModels`);
-                                        const instructorCourses = coursesResponse.data.filter(course =>
-                                            String(course.instructorId || course.InstructorId) === String(instructorId)
-                                        );
-                                        const courseIds = instructorCourses.map(c => c.courseId || c.CourseId);
-                                        console.log(`Found ${courseIds.length} courses for this instructor`);
-
-                                        // 2. Fetch all assessments for these courses
-                                        console.log("Fetching course assessments...");
-                                        const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
-                                        const instructorAssessments = assessmentsResponse.data.filter(assessment =>
-                                            courseIds.includes(assessment.courseId || assessment.CourseId)
-                                        );
-                                        const assessmentIds = instructorAssessments.map(a => a.assessmentId || a.AssessmentId);
-                                        console.log(`Found ${assessmentIds.length} assessments for this instructor's courses`);
-
-                                        // 3. Fetch all results for these assessments
-                                        console.log("Fetching assessment results...");
-                                        const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
-                                        const assessmentResults = resultsResponse.data.filter(result =>
-                                            assessmentIds.includes(result.assessmentId || result.AssessmentId)
-                                        );
-                                        console.log(`Found ${assessmentResults.length} results to delete`);
-
-                                        // 4. Delete results first (bottom of dependency chain)
-                                        console.log("Deleting assessment results...");
-                                        for (const result of assessmentResults) {
-                                            const resultId = result.resultId || result.ResultId;
-                                            await axios.delete(`${API_BASE_URL}/ResultModels/${resultId}`, {
-                                                headers: {
-                                                    'Authorization': `Bearer ${token}`,
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            });
-                                            console.log(`Deleted result ID: ${resultId}`);
-                                        }
-
-                                        // 5. Delete assessments next
-                                        console.log("Deleting assessments...");
-                                        for (const assessmentId of assessmentIds) {
-                                            await axios.delete(`${API_BASE_URL}/AssessmentModels/${assessmentId}`, {
-                                                headers: {
-                                                    'Authorization': `Bearer ${token}`,
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            });
-                                            console.log(`Deleted assessment ID: ${assessmentId}`);
-                                        }
-
-                                        // 6. Delete courses next
-                                        console.log("Deleting courses...");
-                                        for (const courseId of courseIds) {
-                                            await axios.delete(`${API_BASE_URL}/CourseModels/${courseId}`, {
-                                                headers: {
-                                                    'Authorization': `Bearer ${token}`,
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            });
-                                            console.log(`Deleted course ID: ${courseId}`);
-                                        }
-
-                                        // 7. Finally delete the instructor account
-                                        console.log("Deleting instructor account...");
-                                        await axios.delete(`${API_BASE_URL}/UserModels/${instructorId}`, {
-                                            headers: {
-                                                'Authorization': `Bearer ${token}`,
-                                                'Content-Type': 'application/json'
-                                            }
-                                        });
-                                        console.log("Instructor account deleted successfully");
-
-                                        // Logout and redirect to login page
-                                        logout();
-                                        navigate("/login");
-                                    } catch (err) {
-                                        console.error("Delete account error:", err);
-                                        setDeleteError("Failed to delete account. Please ensure all related data is deleted first.");
-                                    } finally {
-                                        setDeleteLoading(false);
-                                    }
-                                }}
-                                disabled={deleteLoading}
-                            >
-                                {deleteLoading ? "Deleting..." : "Delete Account"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Password Change Modal */}
-            {showPasswordModal && (
-                <div className="modal-overlay">
-                    <div className="confirmation-modal">
-                        <div className="modal-header">
-                            <h3><FaKey className="modal-icon" /> Change Password</h3>
-                        </div>
-                        <div className="modal-body">
-                            <form onSubmit={handlePasswordSubmit} className="password-form">
-                                {passwordError && <div className="alert alert-error">{passwordError}</div>}
-                                {passwordSuccess && <div className="alert alert-success">{passwordSuccess}</div>}
-
-                                <div className="form-group">
-                                    <label htmlFor="currentPassword">Current Password</label>
-                                    <div className="password-input">
-                                        <input
-                                            type={showCurrentPassword ? "text" : "password"}
-                                            id="currentPassword"
-                                            name="currentPassword"
-                                            value={passwordData.currentPassword}
-                                            onChange={handlePasswordChange}
-                                            required
-                                        />
-                                        <button type="button" onClick={toggleCurrentPasswordVisibility}>
-                                            {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="newPassword">New Password</label>
-                                    <div className="password-input">
-                                        <input
-                                            type={showNewPassword ? "text" : "password"}
-                                            id="newPassword"
-                                            name="newPassword"
-                                            value={passwordData.newPassword}
-                                            onChange={handlePasswordChange}
-                                            required
-                                            minLength="6"
-                                        />
-                                        <button type="button" onClick={toggleNewPasswordVisibility}>
-                                            {showNewPassword ? <FaEye /> : <FaEyeSlash />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="confirmPassword">Confirm New Password</label>
-                                    <div className="password-input">
-                                        <input
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            id="confirmPassword"
-                                            name="confirmPassword"
-                                            value={passwordData.confirmPassword}
-                                            onChange={handlePasswordChange}
-                                            required
-                                        />
-                                        <button type="button" onClick={toggleConfirmPasswordVisibility}>
-                                            {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="modal-footer">
-                                    <button
-                                        type="button"
-                                        className="modal-button cancel"
-                                        onClick={() => setShowPasswordModal(false)}
-                                        disabled={passwordLoading}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="modal-button update"
-                                        disabled={passwordLoading}
-                                    >
-                                        {passwordLoading ? "Updating..." : "Update Password"}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                                        </td>
+                                        <td>
+                                            <div className={styles.assessmentActions}>
+                                                <Link 
+                                                    to={`/courses/${courseId}/assessment/${assessmentId}`} 
+                                                    className={styles.viewButton}
+                                                >
+                                                    View
+                                                </Link>
+                                                <button className={styles.deleteButton}>
+                                                    <FaTrashAlt />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>
