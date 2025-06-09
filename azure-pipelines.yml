@@ -1,0 +1,54 @@
+# azure-pipelines-frontend.yml
+# This pipeline builds and deploys the React frontend to Azure Static Web Apps
+
+# Trigger the pipeline on pushes to the main branch
+trigger:
+- main
+
+# Use a Microsoft-hosted agent VM image (ubuntu-latest is recommended)
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Define variables (optional for SWA name, but good practice)
+variables:
+  # --- Azure Static Web App Details ---
+  # Replace these with your actual Static Web App name
+  staticWebAppName: 'edusync-frontend' # <-- Replace with your SWA name if different
+  # ------------------------------------
+
+# Define the steps (tasks) for the pipeline
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x' # Specify a suitable Node.js version (e.g., 18.x or 20.x)
+  displayName: 'Install Node.js' # Display name for this step in the pipeline logs
+
+- script: |
+    npm install # Install project dependencies
+    npm run build # Build the React application
+  displayName: 'Build React App' # Display name for this step
+  workingDirectory: '$(System.DefaultWorkingDirectory)' # Ensure commands run from the repo root
+
+- task: AzureStaticWebApp@0
+  inputs:
+    # --- Paths based on your React project structure ---
+    # app_location: Location of your application code within the repo relative to repo root
+    app_location: '/'
+    # output_location: Location of the build output (relative to app_location)
+    # For create-react-app (react-scripts), the default build output folder is 'build'
+    output_location: 'build'
+    # ---------------------------------------------------
+
+    # --- Azure Connection Details ---
+    # The deployment token is retrieved from pipeline variables securely
+    azure_static_web_apps_api_token: $(deployment_token) # This variable must be set securely!
+    # You don't need to specify the Service Connection name here for the SWA task.
+    # The SWA task uses a dedicated deployment token.
+  displayName: 'Deploy to Azure Static Web Apps' # Display name for this step
+
+# Important: Remember to set the 'deployment_token' variable securely in pipeline settings.
+# This variable holds the deployment token copied from your Static Web App overview page in Azure Portal.
+# To set this in Azure DevOps:
+# 1. Go to Pipelines > Edit Pipeline > Variables
+# 2. Add 'deployment_token' variable with the value from Azure Static Web App
+# 3. Mark it as secret (check the lock icon)

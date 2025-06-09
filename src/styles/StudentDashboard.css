@@ -1,0 +1,194 @@
+.student-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.2rem;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.welcome-message {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.dashboard-section {
+    margin-bottom: 3rem;
+}
+
+.empty-state {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.course-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.course-card {
+    background: #23234b;
+    padding: 1.5rem;
+    border-radius: 10px;
+    color: white;
+}
+
+.course-info h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.course-info p {
+    margin-bottom: 1rem;
+    color: #d1d1d1;
+}
+
+.course-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3a5ec2;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #4e73df;
+    color: #4e73df;
+}
+
+.btn-outline:hover {
+    background-color: #e9ecef;
+}
+
+.btn-disabled {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.loading-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.browse-all {
+    text-align: right;
+    margin-top: 1rem;
+}
+
+.recommended-courses {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+}
+
+.recommended-card {
+    background: #23234b;
+    padding: 1.5rem;
+    border-radius: 10px;
+    min-width: 250px;
+    color: white;
+}
+
+.recommended-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.recommended-card p {
+    margin-bottom: 1rem;
+    color: #d1d1d1;
+}
+
+.results-table-container {
+    overflow-x: auto;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.results-table th,
+.results-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.results-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.results-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.view-all-results {
+    text-align: right;
+    margin-top: 1rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.course-instructor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #6a0d1b;
+    margin-top: 8px;
+}
+
+.course-instructor svg {
+    margin-right: 4px;
+}

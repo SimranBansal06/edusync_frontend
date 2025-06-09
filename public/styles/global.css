@@ -1,0 +1,59 @@
+/* Global CSS Variables */
+:root {
+    --primary-color: #8b0f23;
+    --secondary-color: #6a0d1b;
+    --navy-bg: #1c2e4a;
+    --white: #ffffff;
+    --dark-text: #1a2a42;
+    --light-text: #4a5568;
+    --light-bg: #f7f9fc;
+    --border-color: #e2e8f0;
+}
+
+/* Ensure proper box-sizing */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Import fonts if needed */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--dark-text);
+    background-color: var(--light-bg);
+}
+
+/* Animation keyframes for global use */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Common utility classes */
+.text-center {
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Fix for potential CSS module issues */
+.instructor-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--dark-text);
+    background: var(--light-bg);
+} 

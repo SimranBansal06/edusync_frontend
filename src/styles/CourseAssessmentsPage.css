@@ -1,0 +1,181 @@
+/* CourseAssessmentsPage.css */
+
+.assessments-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.assessments-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.assessments-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.assessments-subtitle {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.assessment-card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.assessment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.assessment-card-header {
+    background: #4e73df;
+    color: white;
+    padding: 1.25rem;
+}
+
+.assessment-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.assessment-card-body {
+    padding: 1.5rem;
+}
+
+.assessment-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.assessment-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.assessment-description {
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.assessment-button {
+    display: inline-block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #4e73df;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.assessment-button:hover {
+    background-color: #3a5ec2;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4e73df;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    text-decoration: underline;
+}
+
+/* Loading state */
+.loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(78, 115, 223, 0.3);
+    border-radius: 50%;
+    border-top-color: #4e73df;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: #4a5568;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .assessments-header {
+        text-align: left;
+    }
+}
+
+.instructor-info {
+    display: inline-flex;
+    align-items: center;
+    font-style: italic;
+    color: #555;
+    margin-left: 10px;
+}
+
+.instructor-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #6a0d1b;
+    margin-top: 5px;
+}

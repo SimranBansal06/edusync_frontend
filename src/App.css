@@ -1,0 +1,185 @@
+/* App.css
+:root {
+  --primary-color: #e83e8c;
+  --secondary-color: #7c4dff;
+  --dark-bg: #010115;
+  --light-text: #ffffff;
+  --card-bg: #1e1e30;
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  line-height: 1.6;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.page-content {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--light-text);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 1rem 0;
+  }
+} */
+
+:root {
+  --primary-color: #8b0f23;
+  /* Burgundy red */
+  --secondary-color: #6a0d1b;
+  /* Darker burgundy for hover states */
+  --navy-bg: #1c2e4a;
+  /* Navy blue background */
+  --light-bg: #f7f9fc;
+  /* Light blue-tinted background */
+  --white: #ffffff;
+  --dark-text: #1a2a42;
+  /* Darker navy for text */
+  --light-text: #4a5568;
+  /* Medium gray for secondary text */
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --error-color: #cb2431;
+  /* Error color */
+  --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --border-radius: 10px;
+  --transition: all 0.3s ease;
+  --font-heading: 'Georgia', serif;
+  /* Serif font for headings */
+  --font-body: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Sans-serif for body */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  line-height: 1.6;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.page-content {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--dark-text);
+}
+
+/* Basic utility classes */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 6px rgba(67, 97, 238, 0.15);
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(67, 97, 238, 0.2);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: none;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app-main {
+    padding: 1rem 0;
+  }
+}

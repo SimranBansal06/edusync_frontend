@@ -1,0 +1,40 @@
+.simple-loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #8b0f23;
+    z-index: 9999;
+}
+
+.simple-spinner {
+    width: 80px;
+    height: 80px;
+    border: 6px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.simple-logo {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    margin: 30px 0 20px;
+}
+
+.simple-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
