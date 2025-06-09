@@ -21,12 +21,13 @@
 
 /* Welcome banner */
 .welcomeBanner {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
-    color: var(--white);
-    padding: 30px;
-    border-radius: 8px;
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, #4d5d80 0%, #a94a6c 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .welcomeBanner h1 {
@@ -153,14 +154,21 @@
 }
 
 .viewAllLink {
-    color: var(--primary);
-    text-decoration: none;
-    font-size: 14px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .viewAllLink:hover {
-    text-decoration: underline;
+    background-color: #0069d9;
+    text-decoration: none;
 }
 
 /* Course grid */
