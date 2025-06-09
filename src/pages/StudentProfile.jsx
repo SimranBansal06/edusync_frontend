@@ -16,7 +16,6 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import axios from "axios";
-import styles from "../styles/StudentProfile.module.css";
 
 // Hardcoded Azure API URL
 const API_BASE_URL =
