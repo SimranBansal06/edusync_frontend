@@ -14,7 +14,9 @@ import {
     FaGraduationCap,
     FaKey,
     FaEye,
-    FaEyeSlash
+    FaEyeSlash,
+    FaUsers,
+    FaCheckCircle
 } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -533,15 +535,15 @@ const InstructorDashboard = () => {
                             </div>
                         </div>
 
-                        <div className={`${styles["stat-card"]} ${styles.accent}`}>
+                        <div className={`${styles["stat-card"]} ${styles.neutral}`}>
                             <div className={styles["stat-icon"]}>
-                                <FaGraduationCap />
+                                <FaUsers />
                             </div>
                             <div className={styles["stat-details"]}>
                                 <h3>Students</h3>
                                 <p className={styles["stat-value"]}>
                                     {stats.loading ? (
-                                        <span className={styles["loading-dots"]}>...</span>
+                                        <span className={styles["loading-dots"]}></span>
                                     ) : (
                                         stats.students
                                     )}
@@ -549,15 +551,15 @@ const InstructorDashboard = () => {
                             </div>
                         </div>
 
-                        <div className={`${styles["stat-card"]} ${styles.secondary}`}>
+                        <div className={`${styles["stat-card"]} ${styles.primary}`}>
                             <div className={styles["stat-icon"]}>
-                                <FaChartBar />
+                                <FaCheckCircle />
                             </div>
                             <div className={styles["stat-details"]}>
-                                <h3>Assessment Completions</h3>
+                                <h3>Completions</h3>
                                 <p className={styles["stat-value"]}>
                                     {stats.loading ? (
-                                        <span className={styles["loading-dots"]}>...</span>
+                                        <span className={styles["loading-dots"]}></span>
                                     ) : (
                                         stats.completions
                                     )}
