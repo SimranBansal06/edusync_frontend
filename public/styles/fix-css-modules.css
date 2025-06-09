@@ -51,10 +51,16 @@
 }
 
 /* Assessment table styles */
+.assessment-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .assessment-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    font-size: 0.95rem;
 }
 
 .assessment-table th,
@@ -62,6 +68,136 @@
     padding: 0.75rem 1rem;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
+}
+
+.assessment-table th {
+    font-weight: 600;
+    color: #1a2a42;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.assessment-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.assessment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.assessment-name {
+    font-weight: 500;
+    color: #1a2a42;
+}
+
+.assessment-course {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4a5568;
+}
+
+.course-icon {
+    color: #8b0f23;
+    font-size: 0.9rem;
+}
+
+.view-button {
+    padding: 0.4rem 0.8rem;
+    background-color: #8b0f23;
+    color: #ffffff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.view-button:hover {
+    background-color: #6a0d1b;
+    text-decoration: none;
+}
+
+.delete-button {
+    padding: 0.4rem;
+    background: none;
+    border: none;
+    color: #4a5568;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.delete-button:hover {
+    color: #e53e3e;
+    background-color: rgba(229, 62, 62, 0.1);
+}
+
+/* Empty state styles */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #4a5568;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #1a2a42;
+}
+
+.empty-state p {
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+}
+
+.action-button.primary {
+    background-color: #8b0f23;
+    color: #ffffff;
+}
+
+.action-button.secondary {
+    background-color: #6a0d1b;
+    color: #ffffff;
+}
+
+.button-icon {
+    font-size: 1rem;
+    margin-right: 0.25rem;
 }
 
 /* This ensures that CSS modules work properly in production */ 

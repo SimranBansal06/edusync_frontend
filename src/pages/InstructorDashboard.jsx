@@ -658,22 +658,22 @@ const InstructorDashboard = () => {
                             </div>
 
                             {data.assessments.length === 0 ? (
-                                <div className="empty-visustate">
-                                    <div className="empty-icon">📝</div>
+                                <div className={styles["empty-state"]}>
+                                    <div className={styles["empty-state-icon"]}>📝</div>
                                     <h3>No assessments yet</h3>
                                     <p>Create an assessment for one of your courses</p>
-                                    <div className="empty-state-actions">
-                                        <Link to="/assessment/create" className="action-button secondary">
-                                            <FaPlus className="button-icon" /> Create Assessment
+                                    <div className={styles["empty-state-actions"]}>
+                                        <Link to="/assessment/create" className={`${styles["action-button"]} ${styles.secondary}`}>
+                                            <FaPlus className={styles["button-icon"]} /> Create Assessment
                                         </Link>
-                                        <button onClick={fetchData} className="action-button primary refresh-button">
-                                            <FaSync className="button-icon" /> Refresh Data
+                                        <button onClick={fetchData} className={`${styles["action-button"]} ${styles.primary}`}>
+                                            <FaSync className={styles["button-icon"]} /> Refresh Data
                                         </button>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="assessment-table-container">
-                                    <table className="assessment-table">
+                                <div className={styles["assessment-table-container"]}>
+                                    <table className={styles["assessment-table"]}>
                                         <thead>
                                             <tr>
                                                 <th>Assessment Title</th>
@@ -699,24 +699,24 @@ const InstructorDashboard = () => {
                                                 return (
                                                     <tr key={assessmentId}>
                                                         <td>
-                                                            <span className="assessment-name">{title}</span>
+                                                            <span className={styles["assessment-name"]}>{title}</span>
                                                         </td>
                                                         <td>
-                                                            <div className="assessment-course">
-                                                                <FaBook className="course-icon" />
+                                                            <div className={styles["assessment-course"]}>
+                                                                <FaBook className={styles["course-icon"]} />
                                                                 <span>{courseName}</span>
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <div className="assessment-actions">
+                                                            <div className={styles["assessment-actions"]}>
                                                                 <Link
                                                                     to={`/courses/${courseId}/assessment/${assessmentId}`}
-                                                                    className="view-button"
+                                                                    className={styles["view-button"]}
                                                                 >
                                                                     View
                                                                 </Link>
                                                                 <button
-                                                                    className="delete-button"
+                                                                    className={styles["delete-button"]}
                                                                     title="Delete assessment"
                                                                     onClick={() => handleDeleteAssessment(assessmentId, title)}
                                                                 >

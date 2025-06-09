@@ -480,10 +480,16 @@
 }
 
 /* Assessment table styles */
+.assessment-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .assessment-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    font-size: 0.95rem;
 }
 
 .assessment-table th,
@@ -505,24 +511,61 @@
 
 .assessment-actions {
     display: flex;
+    justify-content: flex-end;
     gap: 0.5rem;
 }
 
-.action-icon {
-    padding: 0.4rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
+.assessment-name {
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+.assessment-course {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     color: var(--light-text);
 }
 
-.action-icon:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.course-icon {
     color: var(--primary-color);
+    font-size: 0.9rem;
 }
 
-.delete-icon:hover {
+.view-button {
+    padding: 0.4rem 0.8rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.view-button:hover {
+    background-color: var(--secondary-color);
+    text-decoration: none;
+}
+
+.delete-button {
+    padding: 0.4rem;
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.delete-button:hover {
     color: #e53e3e;
+    background-color: rgba(229, 62, 62, 0.1);
 }
 
 /* Empty state styles */
