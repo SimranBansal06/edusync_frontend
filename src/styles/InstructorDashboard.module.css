@@ -298,12 +298,13 @@
 
 .action-button.primary:hover {
     background-color: var(--secondary-color);
-    box-shadow: 0 6px 16px rgba(139, 15, 35, 0.15);
+    transform: translateY(-2px);
 }
 
 .action-button.secondary:hover {
-    background-color: #15243c;
-    box-shadow: 0 6px 16px rgba(28, 46, 74, 0.15);
+    background-color: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-2px);
 }
 
 .button-icon {
@@ -420,3 +421,44 @@
 }
 
 /* Add more styles as needed for the rest of the dashboard */
+
+.modal-body {
+    padding: 1.5rem;
+    color: var(--dark-text);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.warning-text {
+    color: #dc3545;
+}
+
+.empty-state-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Global animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Other dashboard specific styles */
+.delete-account-bottom {}
+
+.modal-icon {
+    font-size: 1.5rem;
+}
