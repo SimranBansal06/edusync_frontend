@@ -18,12 +18,50 @@ const InstructorDashboard = () => {
         studentCount: 0,
         completionCount: 0
     });
+    const [authDebug, setAuthDebug] = useState({
+        hasCurrentUser: false,
+        userRole: null,
+        sessionStorageUser: null,
+        isInstructorResult: false
+    });
+    const [apiDebug, setApiDebug] = useState({
+        apiBaseUrl: API_BASE_URL,
+        instructorId: null,
+        coursesResponse: null,
+        assessmentsResponse: null,
+        error: null
+    });
 
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, isInstructor } = useAuth();
+
+    // Add debugging effect
+    useEffect(() => {
+        try {
+            const sessionUser = JSON.parse(sessionStorage.getItem('user'));
+            setAuthDebug({
+                hasCurrentUser: !!currentUser,
+                userRole: currentUser?.role || 'no role',
+                sessionStorageUser: sessionUser ? {
+                    hasUser: true,
+                    role: sessionUser.role || 'no role in session',
+                    userId: sessionUser.id || sessionUser.Id || sessionUser.userId || sessionUser.UserId || 'no id found'
+                } : 'no user in session',
+                isInstructorResult: isInstructor()
+            });
+            console.log('Auth Debug:', {
+                currentUser,
+                sessionUser,
+                isInstructorResult: isInstructor()
+            });
+        } catch (error) {
+            console.error('Error in debug code:', error);
+        }
+    }, [currentUser, isInstructor]);
 
     useEffect(() => {
-        if (!currentUser) {
+        if (!currentUser && !sessionStorage.getItem('user')) {
+            console.log('No user data, redirecting to login');
             navigate('/login');
             return;
         }
@@ -31,46 +69,114 @@ const InstructorDashboard = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const instructorId = currentUser.id || currentUser.Id;
-
-                // Fetch courses
-                const coursesResponse = await axios.get(`${API_BASE_URL}/CourseModels`);
-                const instructorCourses = coursesResponse.data.filter(course => 
-                    String(course.instructorId || course.InstructorId) === String(instructorId)
-                );
                 
-                // Fetch assessments
-                const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
-                const courseIds = instructorCourses.map(c => c.courseId || c.CourseId);
-                const instructorAssessments = assessmentsResponse.data.filter(assessment => 
-                    courseIds.includes(assessment.courseId || assessment.CourseId)
-                );
-
-                // Fetch results for statistics
-                const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
-                const assessmentIds = instructorAssessments.map(a => a.assessmentId || a.AssessmentId);
+                // Get user data either from context or session storage
+                let userData = currentUser;
+                if (!userData) {
+                    try {
+                        userData = JSON.parse(sessionStorage.getItem('user'));
+                    } catch (e) {
+                        console.error('Error parsing user from session storage:', e);
+                    }
+                }
                 
-                // Calculate statistics
-                const assessmentResults = resultsResponse.data.filter(result => 
-                    assessmentIds.includes(result.assessmentId || result.AssessmentId)
-                );
+                if (!userData) {
+                    console.error('No user data available');
+                    setApiDebug(prev => ({...prev, error: 'No user data available'}));
+                    setLoading(false);
+                    return;
+                }
                 
-                const uniqueStudentIds = [...new Set(assessmentResults.map(result => 
-                    result.studentId || result.StudentId
-                ))];
+                // Try multiple possible ID field names
+                const instructorId = userData.id || userData.Id || userData.userId || userData.UserId;
+                console.log('Fetching data for instructor ID:', instructorId);
+                setApiDebug(prev => ({...prev, instructorId}));
 
-                setCourses(instructorCourses);
-                setAssessments(instructorAssessments);
-                setStats({
-                    courseCount: instructorCourses.length,
-                    assessmentCount: instructorAssessments.length,
-                    studentCount: uniqueStudentIds.length,
-                    completionCount: assessmentResults.length
-                });
+                if (!instructorId) {
+                    console.error('Could not determine instructor ID');
+                    setApiDebug(prev => ({...prev, error: 'Could not determine instructor ID'}));
+                    setLoading(false);
+                    return;
+                }
+
+                // Fetch courses with error handling
+                try {
+                    console.log('Fetching courses from:', `${API_BASE_URL}/CourseModels`);
+                    const coursesResponse = await axios.get(`${API_BASE_URL}/CourseModels`);
+                    console.log('Courses response:', coursesResponse.data);
+                    
+                    // Log all possible instructor ID fields in courses
+                    if (coursesResponse.data.length > 0) {
+                        const firstCourse = coursesResponse.data[0];
+                        console.log('First course instructor ID fields:', {
+                            instructorId: firstCourse.instructorId,
+                            InstructorId: firstCourse.InstructorId,
+                            instructor_id: firstCourse.instructor_id
+                        });
+                    }
+                    
+                    // Try to match on multiple possible ID field names
+                    const instructorCourses = coursesResponse.data.filter(course => {
+                        const courseInstructorId = course.instructorId || course.InstructorId || course.instructor_id;
+                        return String(courseInstructorId) === String(instructorId);
+                    });
+                    
+                    console.log('Instructor courses:', instructorCourses);
+                    setCourses(instructorCourses);
+                    setApiDebug(prev => ({...prev, coursesResponse: {
+                        total: coursesResponse.data.length,
+                        filtered: instructorCourses.length,
+                        sample: instructorCourses.slice(0, 2)
+                    }}));
+                    
+                    // Fetch assessments
+                    const assessmentsResponse = await axios.get(`${API_BASE_URL}/AssessmentModels`);
+                    console.log('Assessments response:', assessmentsResponse.data);
+                    
+                    const courseIds = instructorCourses.map(c => c.courseId || c.CourseId || c.id || c.Id);
+                    const instructorAssessments = assessmentsResponse.data.filter(assessment => {
+                        const assessmentCourseId = assessment.courseId || assessment.CourseId || assessment.course_id;
+                        return courseIds.includes(assessmentCourseId);
+                    });
+                    
+                    console.log('Instructor assessments:', instructorAssessments);
+                    setAssessments(instructorAssessments);
+                    setApiDebug(prev => ({...prev, assessmentsResponse: {
+                        total: assessmentsResponse.data.length,
+                        filtered: instructorAssessments.length,
+                        sample: instructorAssessments.slice(0, 2)
+                    }}));
+
+                    // Fetch results for statistics
+                    const resultsResponse = await axios.get(`${API_BASE_URL}/ResultModels`);
+                    const assessmentIds = instructorAssessments.map(a => a.assessmentId || a.AssessmentId || a.id || a.Id);
+                    
+                    // Calculate statistics
+                    const assessmentResults = resultsResponse.data.filter(result => {
+                        const resultAssessmentId = result.assessmentId || result.AssessmentId || result.assessment_id;
+                        return assessmentIds.includes(resultAssessmentId);
+                    });
+                    
+                    const uniqueStudentIds = [...new Set(assessmentResults.map(result => 
+                        result.studentId || result.StudentId || result.student_id
+                    ))];
+
+                    setStats({
+                        courseCount: instructorCourses.length,
+                        assessmentCount: instructorAssessments.length,
+                        studentCount: uniqueStudentIds.length,
+                        completionCount: assessmentResults.length
+                    });
+                    
+                } catch (apiError) {
+                    console.error("API Error:", apiError);
+                    setApiDebug(prev => ({...prev, error: `API Error: ${apiError.message}`}));
+                }
                 
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
+                setApiDebug(prev => ({...prev, error: `General Error: ${error.message}`}));
                 setLoading(false);
             }
         };
@@ -102,6 +208,14 @@ const InstructorDashboard = () => {
 
     return (
         <div className={styles.dashboardContainer}>
+            {/* Debug Info */}
+            <div style={{padding: '10px', margin: '10px 0', background: '#f8f9fa', border: '1px solid #ddd', borderRadius: '4px'}}>
+                <h4>Auth Debug Info:</h4>
+                <pre>{JSON.stringify(authDebug, null, 2)}</pre>
+                <h4>API Debug Info:</h4>
+                <pre>{JSON.stringify(apiDebug, null, 2)}</pre>
+            </div>
+
             {/* Welcome Banner */}
             <div className={styles.welcomeBanner}>
                 <h1>Welcome back, {currentUser?.name || currentUser?.Name || 'Instructor'}</h1>
@@ -177,14 +291,15 @@ const InstructorDashboard = () => {
             ) : (
                 <div className={styles.courseGrid}>
                     {courses.slice(0, 3).map((course, index) => {
-                        const courseId = course.courseId || course.CourseId;
+                        const courseId = course.courseId || course.CourseId || course.id || course.Id;
                         const title = course.title || course.Title;
                         const description = course.description || course.Description;
                         
                         // Count assessments for this course
-                        const courseAssessmentCount = assessments.filter(
-                            a => (a.courseId || a.CourseId) === courseId
-                        ).length;
+                        const courseAssessmentCount = assessments.filter(a => {
+                            const assessmentCourseId = a.courseId || a.CourseId || a.course_id;
+                            return assessmentCourseId === courseId;
+                        }).length;
                         
                         return (
                             <div key={courseId} className={styles.courseCard}>
@@ -244,14 +359,15 @@ const InstructorDashboard = () => {
                         </thead>
                         <tbody>
                             {assessments.map(assessment => {
-                                const assessmentId = assessment.assessmentId || assessment.AssessmentId;
-                                const courseId = assessment.courseId || assessment.CourseId;
+                                const assessmentId = assessment.assessmentId || assessment.AssessmentId || assessment.id || assessment.Id;
+                                const courseId = assessment.courseId || assessment.CourseId || assessment.course_id;
                                 const title = assessment.title || assessment.Title;
                                 
                                 // Find related course
-                                const relatedCourse = courses.find(c => 
-                                    (c.courseId || c.CourseId) === courseId
-                                );
+                                const relatedCourse = courses.find(c => {
+                                    const cId = c.courseId || c.CourseId || c.id || c.Id;
+                                    return cId === courseId;
+                                });
                                 
                                 const courseName = relatedCourse ? 
                                     (relatedCourse.title || relatedCourse.Title) : 
